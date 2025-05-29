@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -8,6 +7,8 @@ import { Settings as SettingsIcon, Users, Shield, Bell, User, Lock } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import Header from '@/components/layout/Header';
+import { mockBranches, mockProjects, allEmployees } from '@/data/mockData';
 
 const Settings = () => {
   const isMobile = useIsMobile();
@@ -28,19 +29,15 @@ const Settings = () => {
         "flex-1 flex flex-col",
         !isMobile && "ml-64"
       )}>
-        <Navbar 
-          title="System Settings" 
-          subtitle="Manage system configuration and preferences"
+        <Header
+          title="User Management"
+          subtitle="Manage user accounts and permissions"
+          mockBranches={mockBranches}
+          allEmployees={allEmployees}
+          mockProjects={mockProjects}
         />
         
         <main className="flex-1 px-6 py-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">System Settings</h1>
-              <p className="text-muted-foreground">Configure system preferences and user management</p>
-            </div>
-          </div>
-
           <div className="flex gap-6">
             <div className="w-64 glass-card rounded-xl p-4">
               <nav className="space-y-2">

@@ -1,96 +1,50 @@
-
 import React, { useState } from 'react';
-import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
+import Header from '@/components/layout/Header';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Employee, UserRole, Department, CertificateStatus } from '@/types';
-import { Users, Search, Filter, Plus, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-const mockEmployees: Employee[] = [
-  {
-    id: 'EMP001',
-    name: 'Michael Hassan',
-    role: UserRole.SUPERVISOR_HEAD,
-    department: Department.IT,
-    branchId: 'BR001',
-    email: 'michael.hassan@areno.co.tz',
-    phone: '+255 123 456 789',
-    startDate: '2023-01-15',
-    asoExpirationDate: '2024-12-31',
-    nrExpirationDate: '2024-11-30',
-    asoStatus: CertificateStatus.REGULAR,
-    nrStatus: CertificateStatus.WARNING,
-    isActive: true
-  },
-  {
-    id: 'EMP002',
-    name: 'Fatima Said',
-    role: UserRole.SUPERVISOR_HEAD,
-    department: Department.HR,
-    branchId: 'BR002',
-    email: 'fatima.said@areno.co.tz',
-    phone: '+255 234 567 890',
-    startDate: '2022-03-20',
-    asoExpirationDate: '2024-06-15',
-    nrExpirationDate: '2024-08-20',
-    asoStatus: CertificateStatus.EXPIRED,
-    nrStatus: CertificateStatus.REGULAR,
-    isActive: true
-  },
-  {
-    id: 'EMP003',
-    name: 'James Mbeki',
-    role: UserRole.SENIOR_OFFICER,
-    department: Department.OPERATIONS,
-    branchId: 'BR003',
-    email: 'james.mbeki@areno.co.tz',
-    phone: '+255 345 678 901',
-    startDate: '2023-06-10',
-    asoExpirationDate: '2025-01-10',
-    nrExpirationDate: '2025-02-15',
-    asoStatus: CertificateStatus.REGULAR,
-    nrStatus: CertificateStatus.REGULAR,
-    isActive: true
-  }
-];
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
+import { mockBranches, mockProjects, allEmployees } from '@/data/mockData';
 
 const Employees = () => {
   const isMobile = useIsMobile();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [newEmployeeDialog, setNewEmployeeDialog] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    name: '',
+    email: '',
+    department: '',
+    role: '',
+    branch: ''
+  });
 
-  const filteredEmployees = mockEmployees.filter(employee =>
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getStatusIcon = (status: CertificateStatus) => {
-    switch (status) {
-      case CertificateStatus.REGULAR:
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case CertificateStatus.WARNING:
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case CertificateStatus.EXPIRED:
-        return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      default:
-        return null;
+  const handleNewEmployee = () => {
+    // Validate form
+    if (!newEmployee.name || !newEmployee.email || !newEmployee.department || !newEmployee.role || !newEmployee.branch) {
+      toast.error('Please fill in all required fields');
+      return;
     }
-  };
 
-  const getStatusColor = (status: CertificateStatus) => {
-    switch (status) {
-      case CertificateStatus.REGULAR:
-        return 'bg-green-100 text-green-800';
-      case CertificateStatus.WARNING:
-        return 'bg-yellow-100 text-yellow-800';
-      case CertificateStatus.EXPIRED:
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    // Here you would typically make an API call to create the employee
+    console.log('Creating new employee:', newEmployee);
+    
+    // Show success message
+    toast.success('New employee added successfully');
+    
+    // Reset form and close dialog
+    setNewEmployee({
+      name: '',
+      email: '',
+      department: '',
+      role: '',
+      branch: ''
+    });
+    setNewEmployeeDialog(false);
   };
 
   return (
@@ -101,145 +55,89 @@ const Employees = () => {
         "flex-1 flex flex-col",
         !isMobile && "ml-64"
       )}>
-        <Navbar 
-          title="Employee Management" 
-          subtitle="Manage staff across all branches"
+        <Header
+          title="Employees"
+          subtitle="Manage your workforce"
+          mockBranches={mockBranches}
+          allEmployees={allEmployees}
+          mockProjects={mockProjects}
         />
         
-        <main className="flex-1 px-6 py-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">Employee Management</h1>
-              <p className="text-muted-foreground">Oversee staff records and compliance</p>
-            </div>
-            <Button className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Employee
-            </Button>
-          </div>
-
-          <div className="flex gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              Filter
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredEmployees.map((employee) => (
-              <div 
-                key={employee.id}
-                className="glass-card glass-card-hover rounded-xl p-6 cursor-pointer transition-all duration-300"
-                onClick={() => setSelectedEmployee(employee)}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
+        <main className="flex-1 p-4 md:p-6 space-y-8">
+          {/* Employee List */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Employee List</h2>
+              <Dialog open={newEmployeeDialog} onOpenChange={setNewEmployeeDialog}>
+                <DialogTrigger asChild>
+                  <Button>Add Employee</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Employee</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={newEmployee.name}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                      />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">{employee.name}</h3>
-                      <p className="text-sm text-muted-foreground">{employee.id}</p>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newEmployee.email}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                      />
                     </div>
-                  </div>
-                  <span className={cn(
-                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
-                    employee.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  )}>
-                    {employee.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Role:</span>
-                    <span className="font-medium">{employee.role}</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Department:</span>
-                    <span>{employee.department}</span>
-                  </div>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Start Date:</span>
-                    <span>{employee.startDate}</span>
-                  </div>
-
-                  <div className="pt-3 border-t border-border space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">ASO Status:</span>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(employee.asoStatus)}
-                        <span className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium",
-                          getStatusColor(employee.asoStatus)
-                        )}>
-                          {employee.asoStatus}
-                        </span>
-                      </div>
+                    <div>
+                      <Label htmlFor="department">Department</Label>
+                      <Input
+                        id="department"
+                        value={newEmployee.department}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
+                      />
                     </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">NR Status:</span>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(employee.nrStatus)}
-                        <span className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium",
-                          getStatusColor(employee.nrStatus)
-                        )}>
-                          {employee.nrStatus}
-                        </span>
-                      </div>
+                    <div>
+                      <Label htmlFor="role">Role</Label>
+                      <Input
+                        id="role"
+                        value={newEmployee.role}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+                      />
                     </div>
+                    <div>
+                      <Label htmlFor="branch">Branch</Label>
+                      <Input
+                        id="branch"
+                        value={newEmployee.branch}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, branch: e.target.value })}
+                      />
+                    </div>
+                    <Button onClick={handleNewEmployee}>Add Employee</Button>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {selectedEmployee && (
-            <div className="mt-8 glass-card rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Employee Details: {selectedEmployee.name}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium mb-2">Contact Information</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Email:</span>
-                      <span className="text-sm">{selectedEmployee.email}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Phone:</span>
-                      <span className="text-sm">{selectedEmployee.phone}</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Certificate Expiry Dates</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">ASO Expires:</span>
-                      <span className="text-sm">{selectedEmployee.asoExpirationDate}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">NR Expires:</span>
-                      <span className="text-sm">{selectedEmployee.nrExpirationDate}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </DialogContent>
+              </Dialog>
             </div>
-          )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allEmployees.map((employee) => (
+                <Card key={employee.id}>
+                  <CardHeader>
+                    <CardTitle>{employee.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{employee.email}</p>
+                    <p className="text-sm text-muted-foreground">{employee.role}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
         </main>
       </div>
     </div>

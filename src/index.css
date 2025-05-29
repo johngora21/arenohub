@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 33% 18%;
 
-    --primary: 216 89% 58%;
+    --primary: 216 89% 15%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 20% 96%;
@@ -23,25 +22,25 @@
     --muted: 210 20% 96%;
     --muted-foreground: 218 11% 45%;
 
-    --accent: 216 89% 96%;
-    --accent-foreground: 216 89% 46%;
+    --accent: 216 89% 15%;
+    --accent-foreground: 216 89% 96%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 216 89% 58%;
+    --ring: 216 89% 15%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 216 89% 58%;
+    --sidebar-background: 216 89% 15%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 0 0% 100%;
     --sidebar-primary-foreground: 222 33% 18%;
-    --sidebar-accent: 216 89% 46%;
+    --sidebar-accent: 216 89% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 216 89% 46%;
+    --sidebar-border: 216 89% 15%;
     --sidebar-ring: 210 40% 98%;
 
     --status-operational: 142 71% 45%;
@@ -60,7 +59,7 @@
     --popover: 222 33% 14%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 216 89% 58%;
+    --primary: 216 89% 15%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 222 33% 18%;
@@ -69,7 +68,7 @@
     --muted: 222 33% 18%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 216 89% 24%;
+    --accent: 216 89% 15%;
     --accent-foreground: 216 89% 96%;
 
     --destructive: 0 62% 50%;
@@ -77,16 +76,16 @@
 
     --border: 222 33% 20%;
     --input: 222 33% 20%;
-    --ring: 216 89% 58%;
+    --ring: 216 89% 15%;
 
-    --sidebar-background: 222 33% 14%;
+    --sidebar-background: 216 89% 15%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 216 89% 58%;
+    --sidebar-primary: 216 89% 15%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 222 33% 20%;
+    --sidebar-accent: 216 89% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 33% 20%;
-    --sidebar-ring: 216 89% 58%;
+    --sidebar-border: 216 89% 15%;
+    --sidebar-ring: 216 89% 15%;
 
     --status-operational: 142 71% 45%;
     --status-maintenance: 41 100% 55%;
@@ -98,6 +97,10 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html, body {
+    @apply h-full w-full m-0 p-0;
   }
 
   body {

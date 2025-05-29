@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
@@ -16,13 +15,36 @@ import {
   Mail,
   Pin,
   Archive,
-  Star
+  Star,
+  Plus,
+  UserPlus,
+  Users2,
+  Megaphone,
+  Building2,
+  Filter,
+  ChevronDown,
+  X,
+  FileText,
+  Image as ImageIcon,
+  Paperclip,
+  SlidersHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import Header from '@/components/layout/Header';
+import { mockBranches, mockProjects, allEmployees } from '@/data/mockData';
 
 interface Chat {
   id: string;
@@ -35,6 +57,8 @@ interface Chat {
   isOnline?: boolean;
   isPinned?: boolean;
   participants?: number;
+  department?: string;
+  branch?: string;
 }
 
 interface Message {
@@ -46,6 +70,39 @@ interface Message {
   type: 'text' | 'image' | 'file';
 }
 
+interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  branch: string;
+  role: string;
+  isOnline: boolean;
+  avatar?: string;
+}
+
+const mockContacts: Contact[] = [
+  {
+    id: '1',
+    name: 'Michael Hassan',
+    email: 'michael.hassan@company.com',
+    department: 'IT',
+    branch: 'HQ',
+    role: 'IT Manager',
+    isOnline: true
+  },
+  {
+    id: '2',
+    name: 'Sarah Ahmed',
+    email: 'sarah.ahmed@company.com',
+    department: 'HR',
+    branch: 'HQ',
+    role: 'HR Director',
+    isOnline: false
+  },
+  // Add more mock contacts as needed
+];
+
 const mockChats: Chat[] = [
   {
     id: '1',
@@ -55,7 +112,9 @@ const mockChats: Chat[] = [
     timestamp: '14:30',
     unread: 3,
     isPinned: true,
-    participants: 8
+    participants: 8,
+    department: 'IT',
+    branch: 'HQ'
   },
   {
     id: '2',
@@ -64,7 +123,9 @@ const mockChats: Chat[] = [
     lastMessage: 'Can we schedule a meeting tomorrow?',
     timestamp: '13:45',
     unread: 1,
-    isOnline: true
+    isOnline: true,
+    department: 'IT',
+    branch: 'HQ'
   },
   {
     id: '3',
@@ -73,7 +134,8 @@ const mockChats: Chat[] = [
     lastMessage: 'New branch opening in Mbeya',
     timestamp: '12:20',
     unread: 0,
-    participants: 357
+    participants: 357,
+    branch: 'All'
   },
   {
     id: '4',
@@ -81,7 +143,9 @@ const mockChats: Chat[] = [
     name: 'HR Department',
     lastMessage: 'Q1 Performance review documents',
     timestamp: '11:15',
-    unread: 2
+    unread: 2,
+    department: 'HR',
+    branch: 'HQ'
   },
   {
     id: '5',
@@ -90,7 +154,8 @@ const mockChats: Chat[] = [
     lastMessage: 'Monthly reports due next week',
     timestamp: '10:30',
     unread: 0,
-    participants: 5
+    participants: 5,
+    branch: 'All'
   }
 ];
 
@@ -126,6 +191,15 @@ const Communication = () => {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(mockChats[0]);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNewGroupDialogOpen, setIsNewGroupDialogOpen] = useState(false);
+  const [isNewAnnouncementDialogOpen, setIsNewAnnouncementDialogOpen] = useState(false);
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [groupName, setGroupName] = useState('');
+  const [announcementContent, setAnnouncementContent] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -154,8 +228,26 @@ const Communication = () => {
   };
 
   const filteredChats = mockChats.filter(chat =>
-    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    (selectedBranch === 'all' || chat.branch === selectedBranch) &&
+    (selectedDepartment === 'all' || chat.department === selectedDepartment)
   );
+
+  const handleCreateGroup = () => {
+    // Handle group creation logic
+    console.log('Creating group:', { name: groupName, members: selectedContacts });
+    setIsNewGroupDialogOpen(false);
+    setGroupName('');
+    setSelectedContacts([]);
+  };
+
+  const handleCreateAnnouncement = () => {
+    // Handle announcement creation logic
+    console.log('Creating announcement:', { content: announcementContent, branch: selectedBranch });
+    setIsNewAnnouncementDialogOpen(false);
+    setAnnouncementContent('');
+    setSelectedBranch('all');
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -165,20 +257,154 @@ const Communication = () => {
         "flex-1 flex flex-col",
         !isMobile && "ml-64"
       )}>
-        <Navbar 
-          title="Communication" 
-          subtitle="Team collaboration and messaging"
+        <Header
+          title="Communication"
+          subtitle="Internal and external communications"
+          mockBranches={mockBranches}
+          allEmployees={allEmployees}
+          mockProjects={mockProjects}
         />
         
         <main className="flex-1 flex">
-          {/* Chat List Sidebar */}
+          {/* Left Sidebar */}
           <div className={cn(
-            "w-full md:w-80 border-r bg-background flex flex-col",
+            "w-full md:w-96 border-r bg-background flex flex-col",
             isMobile && selectedChat && "hidden"
           )}>
             {/* Header */}
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-semibold mb-3">Messages</h2>
+            <div className="p-4 border-b space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Messages</h2>
+                <div className="flex gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" aria-label="Filter" onClick={() => setShowFilters(!showFilters)}>
+                          <SlidersHorizontal className="w-5 h-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Toggle filters</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Dialog open={isNewGroupDialogOpen} onOpenChange={setIsNewGroupDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-1" />
+                        New Chat
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Start a New Conversation</DialogTitle>
+                      </DialogHeader>
+                      <Tabs defaultValue="direct" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="direct">Direct Message</TabsTrigger>
+                          <TabsTrigger value="group">Group Chat</TabsTrigger>
+                          <TabsTrigger value="announcement">Announcement</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="direct" className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Search Contacts</Label>
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                              <Input placeholder="Search by name or email" className="pl-9" />
+                            </div>
+                          </div>
+                          <ScrollArea className="h-[300px] border rounded-md">
+                            {mockContacts.map((contact) => (
+                              <div key={contact.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer">
+                                <Avatar>
+                                  <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium">{contact.name}</p>
+                                  <p className="text-sm text-muted-foreground">{contact.role}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </ScrollArea>
+                        </TabsContent>
+                        <TabsContent value="group" className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Group Name</Label>
+                            <Input
+                              placeholder="Enter group name"
+                              value={groupName}
+                              onChange={(e) => setGroupName(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Select Members</Label>
+                            <ScrollArea className="h-[300px] border rounded-md">
+                              {mockContacts.map((contact) => (
+                                <div key={contact.id} className="flex items-center gap-3 p-3 hover:bg-muted/50">
+                                  <Checkbox
+                                    id={contact.id}
+                                    checked={selectedContacts.includes(contact.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        setSelectedContacts([...selectedContacts, contact.id]);
+                                      } else {
+                                        setSelectedContacts(selectedContacts.filter(id => id !== contact.id));
+                                      }
+                                    }}
+                                  />
+                                  <Label htmlFor={contact.id} className="flex items-center gap-2 flex-1 cursor-pointer">
+                                    <Avatar className="w-8 h-8">
+                                      <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <p className="font-medium">{contact.name}</p>
+                                      <p className="text-sm text-muted-foreground">{contact.role}</p>
+                                    </div>
+                                  </Label>
+                                </div>
+                              ))}
+                            </ScrollArea>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="announcement" className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Target Audience</Label>
+                            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select branch" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Branches</SelectItem>
+                                <SelectItem value="HQ">Headquarters</SelectItem>
+                                <SelectItem value="MBEYA">Mbeya Branch</SelectItem>
+                                <SelectItem value="MWANZA">Mwanza Branch</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Announcement</Label>
+                            <Textarea
+                              placeholder="Enter your announcement..."
+                              value={announcementContent}
+                              onChange={(e) => setAnnouncementContent(e.target.value)}
+                              className="min-h-[200px]"
+                            />
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsNewGroupDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button>
+                          Start Conversation
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
@@ -188,6 +414,55 @@ const Communication = () => {
                   className="pl-9"
                 />
               </div>
+
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="direct">Direct</TabsTrigger>
+                  <TabsTrigger value="group">Groups</TabsTrigger>
+                  <TabsTrigger value="announcement">Announcements</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {showFilters && (
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Filters</Label>
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      setSelectedBranch('all');
+                      setSelectedDepartment('all');
+                    }}>
+                      <X className="w-4 h-4 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Branch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Branches</SelectItem>
+                        <SelectItem value="HQ">Headquarters</SelectItem>
+                        <SelectItem value="MBEYA">Mbeya Branch</SelectItem>
+                        <SelectItem value="MWANZA">Mwanza Branch</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Departments</SelectItem>
+                        <SelectItem value="IT">IT</SelectItem>
+                        <SelectItem value="HR">HR</SelectItem>
+                        <SelectItem value="SALES">Sales</SelectItem>
+                        <SelectItem value="OPS">Operations</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Chat List */}
@@ -198,7 +473,7 @@ const Communication = () => {
                     key={chat.id}
                     onClick={() => setSelectedChat(chat)}
                     className={cn(
-                      "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors relative",
+                      "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors relative group",
                       selectedChat?.id === chat.id && "bg-muted"
                     )}
                   >
@@ -224,9 +499,23 @@ const Communication = () => {
                         <span className="text-xs text-muted-foreground">{chat.timestamp}</span>
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
-                      {chat.participants && chat.type === 'group' && (
-                        <p className="text-xs text-muted-foreground mt-1">{chat.participants} members</p>
-                      )}
+                      <div className="flex items-center gap-2 mt-1">
+                        {chat.type === 'group' && (
+                          <Badge variant="outline" className="text-xs">
+                            {chat.participants} members
+                          </Badge>
+                        )}
+                        {chat.department && (
+                          <Badge variant="outline" className="text-xs">
+                            {chat.department}
+                          </Badge>
+                        )}
+                        {chat.branch && chat.branch !== 'All' && (
+                          <Badge variant="outline" className="text-xs">
+                            {chat.branch}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
                     {chat.unread > 0 && (
@@ -234,6 +523,12 @@ const Communication = () => {
                         {chat.unread}
                       </div>
                     )}
+
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -283,17 +578,44 @@ const Communication = () => {
                   <div className="flex items-center gap-2">
                     {selectedChat.type === 'direct' && (
                       <>
-                        <Button variant="ghost" size="sm">
-                          <Phone className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Video className="w-4 h-4" />
-                        </Button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Phone className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Start voice call</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Video className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Start video call</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </>
                     )}
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>More options</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
 
@@ -342,19 +664,44 @@ const Communication = () => {
                 {/* Message Input */}
                 <div className="p-4 border-t bg-background">
                   <div className="flex items-center gap-2">
-                    <Input
-                      placeholder="Type a message..."
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      className="flex-1"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && newMessage.trim()) {
-                          // Handle send message
-                          console.log('Sending:', newMessage);
-                          setNewMessage('');
-                        }
-                      }}
-                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                              <Paperclip className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Attach file</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                              <ImageIcon className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Send image</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Input
+                        placeholder="Type a message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        className="flex-1"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && newMessage.trim()) {
+                            console.log('Sending:', newMessage);
+                            setNewMessage('');
+                          }
+                        }}
+                      />
+                    </div>
                     <Button 
                       size="sm" 
                       disabled={!newMessage.trim()}

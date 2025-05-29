@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -54,7 +53,7 @@ const Sidebar: React.FC = () => {
     { to: "/finance", icon: DollarSign, label: "Financial Management" },
     { to: "/crm", icon: UserCheck, label: "CRM" },
     { to: "/inventory", icon: Package, label: "Inventory Management" },
-    { to: "/reports", icon: FileText, label: "Reports & Analytics" },
+    { to: "/reports", icon: FileText, label: "Reports" },
     { to: "/communication", icon: MessageSquare, label: "Communication" },
     { to: "/settings", icon: Settings, label: "User Management" },
   ];
