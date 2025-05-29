@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
-  Truck, Users, ClipboardList, Fuel, 
-  Settings, FileText, LayoutDashboard, Menu, X
+  Building2, Users, Briefcase, CheckSquare, 
+  DollarSign, UserCheck, FileText, LayoutDashboard, 
+  Menu, X, Settings, MessageSquare, Package
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -46,12 +47,16 @@ const Sidebar: React.FC = () => {
   
   const links = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/forklifts", icon: Truck, label: "Empilhadeiras" },
-    { to: "/operators", icon: Users, label: "Operadores" },
-    { to: "/operations", icon: ClipboardList, label: "Operações" },
-    { to: "/maintenance", icon: Settings, label: "Manutenção" },
-    { to: "/gas-supply", icon: Fuel, label: "Abastecimento" },
-    { to: "/reports", icon: FileText, label: "Relatórios" },
+    { to: "/branches", icon: Building2, label: "Branch Management" },
+    { to: "/employees", icon: Users, label: "Employee Management" },
+    { to: "/projects", icon: Briefcase, label: "Project Management" },
+    { to: "/tasks", icon: CheckSquare, label: "Task Management" },
+    { to: "/finance", icon: DollarSign, label: "Financial Management" },
+    { to: "/crm", icon: UserCheck, label: "CRM" },
+    { to: "/inventory", icon: Package, label: "Inventory Management" },
+    { to: "/reports", icon: FileText, label: "Reports & Analytics" },
+    { to: "/communication", icon: MessageSquare, label: "Communication" },
+    { to: "/settings", icon: Settings, label: "User Management" },
   ];
 
   return (
@@ -85,7 +90,10 @@ const Sidebar: React.FC = () => {
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between px-4 py-5">
-            <h1 className="text-xl font-bold text-sidebar-foreground">Forklift Manager</h1>
+            <div>
+              <h1 className="text-xl font-bold text-sidebar-foreground">Areno Hub</h1>
+              <p className="text-xs text-sidebar-foreground/70">Management System</p>
+            </div>
             {isMobile && (
               <button
                 onClick={closeSidebar}
@@ -117,8 +125,8 @@ const Sidebar: React.FC = () => {
                 <Users className="w-4 h-4 text-sidebar-accent-foreground" />
               </div>
               <div>
-                <p className="text-sm font-medium text-sidebar-foreground">Administrador</p>
-                <p className="text-xs text-sidebar-foreground/70">v1.0.0</p>
+                <p className="text-sm font-medium text-sidebar-foreground">Administrator</p>
+                <p className="text-xs text-sidebar-foreground/70">Tanzania Operations</p>
               </div>
             </div>
           </div>

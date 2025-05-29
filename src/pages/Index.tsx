@@ -3,53 +3,93 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import DashboardOverview from '@/components/dashboard/DashboardOverview';
-import ForkliftCard from '@/components/forklift/ForkliftCard';
-import { Forklift, ForkliftStatus, ForkliftType } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Branch, Employee, Project, UserRole, Department } from '@/types';
 
-// Mock data for the dashboard
-const mockForklifts: Forklift[] = [
+// Mock data for the Areno Management Hub
+const mockBranches: Branch[] = [
   {
-    id: 'G001',
-    model: 'Toyota 8FGU25',
-    type: ForkliftType.GAS,
-    capacity: '2.500 kg',
-    acquisitionDate: '10/05/2022',
-    lastMaintenance: '15/09/2023',
-    status: ForkliftStatus.OPERATIONAL,
-    hourMeter: 12583,
+    id: 'BR001',
+    name: 'Dar es Salaam HQ',
+    location: 'Dar es Salaam, Tanzania',
+    manager: 'John Mwalimu',
+    status: 'Active',
+    employeeCount: 156,
+    departments: [Department.HR, Department.FINANCE, Department.OPERATIONS, Department.SALES_MARKETING, Department.IT, Department.PROCUREMENT]
   },
   {
-    id: 'E002',
-    model: 'Hyster E50XN',
-    type: ForkliftType.ELECTRIC,
-    capacity: '2.250 kg',
-    acquisitionDate: '22/11/2021',
-    lastMaintenance: '30/10/2023',
-    status: ForkliftStatus.OPERATIONAL,
-    hourMeter: 8452,
+    id: 'BR002', 
+    name: 'Arusha Branch',
+    location: 'Arusha, Tanzania',
+    manager: 'Sarah Kilimanjaro',
+    status: 'Active',
+    employeeCount: 89,
+    departments: [Department.HR, Department.FINANCE, Department.OPERATIONS, Department.SALES_MARKETING]
   },
   {
-    id: 'R003',
-    model: 'Crown RR5725',
-    type: ForkliftType.RETRACTABLE,
-    capacity: '1.800 kg',
-    acquisitionDate: '04/03/2022',
-    lastMaintenance: '12/08/2023',
-    status: ForkliftStatus.MAINTENANCE,
-    hourMeter: 10974,
+    id: 'BR003',
+    name: 'Mwanza Branch', 
+    location: 'Mwanza, Tanzania',
+    manager: 'David Nyerere',
+    status: 'Active',
+    employeeCount: 67,
+    departments: [Department.HR, Department.FINANCE, Department.OPERATIONS, Department.PROCUREMENT]
   },
   {
-    id: 'G004',
-    model: 'Yale GLP050',
-    type: ForkliftType.GAS,
-    capacity: '2.200 kg',
-    acquisitionDate: '18/07/2022',
-    lastMaintenance: '05/11/2023',
-    status: ForkliftStatus.STOPPED,
-    hourMeter: 6782,
+    id: 'BR004',
+    name: 'Dodoma Branch',
+    location: 'Dodoma, Tanzania', 
+    manager: 'Grace Magufuli',
+    status: 'Active',
+    employeeCount: 45,
+    departments: [Department.HR, Department.FINANCE, Department.OPERATIONS]
+  }
+];
+
+const mockProjects: Project[] = [
+  {
+    id: 'PRJ001',
+    name: 'Digital Transformation Initiative',
+    description: 'Implementing new digital systems across all branches',
+    branchId: 'BR001',
+    department: Department.IT,
+    managerId: 'EMP001',
+    managerName: 'Michael Hassan',
+    startDate: '2024-01-15',
+    endDate: '2024-12-31',
+    budget: 250000,
+    status: 'Active',
+    progress: 65
   },
+  {
+    id: 'PRJ002', 
+    name: 'Employee Training Program',
+    description: 'Comprehensive skills development program',
+    branchId: 'BR002',
+    department: Department.HR,
+    managerId: 'EMP002',
+    managerName: 'Fatima Said',
+    startDate: '2024-03-01',
+    endDate: '2024-08-30',
+    budget: 85000,
+    status: 'Active',
+    progress: 40
+  },
+  {
+    id: 'PRJ003',
+    name: 'Infrastructure Expansion',
+    description: 'Expanding warehouse and office facilities',
+    branchId: 'BR003',
+    department: Department.OPERATIONS,
+    managerId: 'EMP003', 
+    managerName: 'James Mbeki',
+    startDate: '2024-02-10',
+    endDate: '2024-10-15',
+    budget: 180000,
+    status: 'Active',
+    progress: 25
+  }
 ];
 
 const Index = () => {
@@ -57,7 +97,7 @@ const Index = () => {
   const [currentDate, setCurrentDate] = useState<string>('');
   
   useEffect(() => {
-    // Set current date in Brazilian format
+    // Set current date in Swahili/English format
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = { 
       weekday: 'long', 
@@ -65,12 +105,7 @@ const Index = () => {
       month: 'long', 
       day: 'numeric' 
     };
-    setCurrentDate(now.toLocaleDateString('pt-BR', options));
-    
-    // First letter uppercase
-    setCurrentDate(prev => 
-      prev.charAt(0).toUpperCase() + prev.slice(1)
-    );
+    setCurrentDate(now.toLocaleDateString('en-US', options));
   }, []);
 
   return (
@@ -79,11 +114,11 @@ const Index = () => {
       
       <div className={cn(
         "flex-1 flex flex-col",
-        !isMobile && "ml-64" // Offset for sidebar when not mobile
+        !isMobile && "ml-64"
       )}>
         <Navbar 
-          title="Dashboard" 
-          subtitle={currentDate}
+          title="Areno Management Hub" 
+          subtitle={`${currentDate} - Tanzania Operations`}
         />
         
         <main className="flex-1 px-6 py-6">
@@ -91,19 +126,105 @@ const Index = () => {
           
           <section className="mt-8 slide-enter" style={{ animationDelay: '0.4s' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">Empilhadeiras Em Destaque</h2>
+              <h2 className="text-2xl font-semibold">Active Branches</h2>
               <button className="text-sm text-primary hover:underline">
-                Ver todas
+                View all branches
               </button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {mockForklifts.map((forklift) => (
-                <ForkliftCard 
-                  key={forklift.id} 
-                  forklift={forklift} 
-                  onClick={() => console.log(`Clicked on ${forklift.id}`)}
-                />
+              {mockBranches.map((branch) => (
+                <div 
+                  key={branch.id}
+                  className="glass-card glass-card-hover rounded-xl p-4 cursor-pointer transition-all duration-300 transform hover:translate-y-[-2px]"
+                  onClick={() => console.log(`Navigate to ${branch.name}`)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold">{branch.name}</h3>
+                      <p className="text-muted-foreground text-sm">{branch.location}</p>
+                    </div>
+                    <span className="inline-flex items-center rounded-full bg-status-operational/10 px-2 py-1 text-xs font-medium text-status-operational">
+                      {branch.status}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Manager:</span>
+                      <span>{branch.manager}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Employees:</span>
+                      <span className="font-semibold">{branch.employeeCount}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Departments:</span>
+                      <span className="font-semibold">{branch.departments.length}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-8 slide-enter" style={{ animationDelay: '0.6s' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold">Active Projects</h2>
+              <button className="text-sm text-primary hover:underline">
+                View all projects
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {mockProjects.map((project) => (
+                <div 
+                  key={project.id}
+                  className="glass-card glass-card-hover rounded-xl p-4 cursor-pointer transition-all duration-300"
+                  onClick={() => console.log(`Navigate to ${project.name}`)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold">{project.name}</h3>
+                      <p className="text-muted-foreground text-sm">{project.department}</p>
+                    </div>
+                    <span className={cn(
+                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
+                      project.status === 'Active' ? 'bg-status-operational/10 text-status-operational' :
+                      project.status === 'Planning' ? 'bg-status-maintenance/10 text-status-maintenance' :
+                      'bg-muted text-muted-foreground'
+                    )}>
+                      {project.status}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Manager:</span>
+                      <span>{project.managerName}</span>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Budget:</span>
+                      <span className="font-semibold">TSh {project.budget.toLocaleString()}</span>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Progress:</span>
+                        <span className="font-semibold">{project.progress}%</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </section>

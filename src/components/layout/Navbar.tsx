@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Bell, Search, ChevronDown } from 'lucide-react';
+import { Bell, Search, ChevronDown, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Badge from '@/components/common/Badge';
 
 interface NavbarProps {
   title: string;
@@ -14,7 +13,12 @@ const Navbar: React.FC<NavbarProps> = ({ title, subtitle }) => {
     <header className="w-full py-4 px-6 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-10">
       <div>
         <h1 className="text-2xl font-bold">{title}</h1>
-        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        {subtitle && (
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+        )}
       </div>
       
       <div className="flex items-center gap-4">
@@ -23,9 +27,16 @@ const Navbar: React.FC<NavbarProps> = ({ title, subtitle }) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <input 
             type="text" 
-            placeholder="Buscar..." 
+            placeholder="Search employees, projects..." 
             className="py-2 pl-10 pr-4 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-ring w-full max-w-xs transition-all duration-300"
           />
+        </div>
+        
+        {/* Branch Selector */}
+        <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border">
+          <MapPin className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Dar es Salaam HQ</span>
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
         </div>
         
         {/* Notifications */}
@@ -39,11 +50,11 @@ const Navbar: React.FC<NavbarProps> = ({ title, subtitle }) => {
         {/* User Menu */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-            A
+            AM
           </div>
           <div className="hidden md:block">
-            <p className="text-sm font-medium">Admin</p>
-            <p className="text-xs text-muted-foreground">Administrador</p>
+            <p className="text-sm font-medium">Amani Mwema</p>
+            <p className="text-xs text-muted-foreground">System Administrator</p>
           </div>
           <ChevronDown className="w-4 h-4 text-muted-foreground" />
         </div>
