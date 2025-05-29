@@ -4,95 +4,158 @@ import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { MessageSquare, Plus, Search, Send, Calendar, Users } from 'lucide-react';
+import { 
+  MessageSquare, 
+  Search, 
+  Send, 
+  Phone, 
+  Video,
+  MoreVertical,
+  Users,
+  Bell,
+  Mail,
+  Pin,
+  Archive,
+  Star
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card } from '@/components/ui/card';
+
+interface Chat {
+  id: string;
+  type: 'direct' | 'group' | 'announcement' | 'email';
+  name: string;
+  lastMessage: string;
+  timestamp: string;
+  unread: number;
+  avatar?: string;
+  isOnline?: boolean;
+  isPinned?: boolean;
+  participants?: number;
+}
 
 interface Message {
   id: string;
-  from: string;
-  to: string;
-  subject: string;
+  sender: string;
   content: string;
   timestamp: string;
-  read: boolean;
-  priority: 'Low' | 'Medium' | 'High';
+  isOwn: boolean;
+  type: 'text' | 'image' | 'file';
 }
 
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  author: string;
-  date: string;
-  department: string;
-  branchId: string;
-}
-
-const mockMessages: Message[] = [
+const mockChats: Chat[] = [
   {
-    id: 'MSG001',
-    from: 'Michael Hassan',
-    to: 'IT Team',
-    subject: 'System Update Schedule',
-    content: 'Please be informed that we will be updating our systems this weekend...',
-    timestamp: '2024-01-20 14:30',
-    read: false,
-    priority: 'High'
+    id: '1',
+    type: 'group',
+    name: 'IT Team',
+    lastMessage: 'System maintenance scheduled for tonight',
+    timestamp: '14:30',
+    unread: 3,
+    isPinned: true,
+    participants: 8
   },
   {
-    id: 'MSG002',
-    from: 'Fatima Said',
-    to: 'All Staff',
-    subject: 'Training Session Reminder',
-    content: 'Reminder about the upcoming training session on project management...',
-    timestamp: '2024-01-19 09:15',
-    read: true,
-    priority: 'Medium'
+    id: '2',
+    type: 'direct',
+    name: 'Michael Hassan',
+    lastMessage: 'Can we schedule a meeting tomorrow?',
+    timestamp: '13:45',
+    unread: 1,
+    isOnline: true
+  },
+  {
+    id: '3',
+    type: 'announcement',
+    name: 'Company Announcements',
+    lastMessage: 'New branch opening in Mbeya',
+    timestamp: '12:20',
+    unread: 0,
+    participants: 357
+  },
+  {
+    id: '4',
+    type: 'email',
+    name: 'HR Department',
+    lastMessage: 'Q1 Performance review documents',
+    timestamp: '11:15',
+    unread: 2
+  },
+  {
+    id: '5',
+    type: 'group',
+    name: 'Branch Managers',
+    lastMessage: 'Monthly reports due next week',
+    timestamp: '10:30',
+    unread: 0,
+    participants: 5
   }
 ];
 
-const mockAnnouncements: Announcement[] = [
+const mockMessages: Message[] = [
   {
-    id: 'ANN001',
-    title: 'New Branch Opening in Mbeya',
-    content: 'We are excited to announce the opening of our new branch in Mbeya, which will serve the southern region of Tanzania.',
-    author: 'CEO Office',
-    date: '2024-01-25',
-    department: 'Executive',
-    branchId: 'ALL'
+    id: '1',
+    sender: 'Michael Hassan',
+    content: 'Good morning team! Ready for today\'s system update?',
+    timestamp: '09:00',
+    isOwn: false,
+    type: 'text'
   },
   {
-    id: 'ANN002',
-    title: 'Q1 Performance Review Process',
-    content: 'The Q1 performance review process will begin next month. Please prepare your self-assessments.',
-    author: 'HR Department',
-    date: '2024-01-22',
-    department: 'HR',
-    branchId: 'ALL'
+    id: '2',
+    sender: 'You',
+    content: 'Yes, all preparations are complete. The maintenance window starts at 10 PM.',
+    timestamp: '09:05',
+    isOwn: true,
+    type: 'text'
+  },
+  {
+    id: '3',
+    sender: 'Sarah Ahmed',
+    content: 'I\'ve backed up all critical data. We\'re good to go!',
+    timestamp: '09:10',
+    isOwn: false,
+    type: 'text'
   }
 ];
 
 const Communication = () => {
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState<'messages' | 'announcements' | 'compose'>('messages');
-  const [newMessage, setNewMessage] = useState({ to: '', subject: '', content: '' });
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(mockChats[0]);
+  const [newMessage, setNewMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const unreadMessages = mockMessages.filter(msg => !msg.read).length;
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'High':
-        return 'bg-red-100 text-red-800';
-      case 'Medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Low':
-        return 'bg-green-100 text-green-800';
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'group':
+        return <Users className="w-4 h-4" />;
+      case 'announcement':
+        return <Bell className="w-4 h-4" />;
+      case 'email':
+        return <Mail className="w-4 h-4" />;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <MessageSquare className="w-4 h-4" />;
     }
   };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'group':
+        return 'text-blue-600';
+      case 'announcement':
+        return 'text-orange-600';
+      case 'email':
+        return 'text-green-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
+  const filteredChats = mockChats.filter(chat =>
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -103,148 +166,220 @@ const Communication = () => {
         !isMobile && "ml-64"
       )}>
         <Navbar 
-          title="Communication & Collaboration" 
-          subtitle="Internal messaging and announcements"
+          title="Communication" 
+          subtitle="Team collaboration and messaging"
         />
         
-        <main className="flex-1 px-6 py-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">Communication Hub</h1>
-              <p className="text-muted-foreground">Stay connected with your team</p>
+        <main className="flex-1 flex">
+          {/* Chat List Sidebar */}
+          <div className={cn(
+            "w-full md:w-80 border-r bg-background flex flex-col",
+            isMobile && selectedChat && "hidden"
+          )}>
+            {/* Header */}
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-semibold mb-3">Messages</h2>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search conversations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
             </div>
-            <Button 
-              className="flex items-center gap-2"
-              onClick={() => setActiveTab('compose')}
-            >
-              <Plus className="w-4 h-4" />
-              New Message
-            </Button>
-          </div>
 
-          <div className="flex gap-1 mb-6">
-            <Button 
-              variant={activeTab === 'messages' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('messages')}
-              className="flex items-center gap-2"
-            >
-              <MessageSquare className="w-4 h-4" />
-              Messages ({unreadMessages})
-            </Button>
-            <Button 
-              variant={activeTab === 'announcements' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('announcements')}
-              className="flex items-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Announcements
-            </Button>
-          </div>
-
-          {activeTab === 'messages' && (
-            <div className="glass-card rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Messages</h2>
-              <div className="space-y-4">
-                {mockMessages.map((message) => (
-                  <div 
-                    key={message.id}
+            {/* Chat List */}
+            <ScrollArea className="flex-1">
+              <div className="p-2">
+                {filteredChats.map((chat) => (
+                  <div
+                    key={chat.id}
+                    onClick={() => setSelectedChat(chat)}
                     className={cn(
-                      "p-4 rounded-lg border transition-all duration-200 cursor-pointer hover:bg-muted/50",
-                      !message.read && "bg-blue-50 border-blue-200"
+                      "flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors relative",
+                      selectedChat?.id === chat.id && "bg-muted"
                     )}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-medium">
-                          {message.from.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="font-medium">{message.from}</div>
-                          <div className="text-sm text-muted-foreground">To: {message.to}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium",
-                          getPriorityColor(message.priority)
-                        )}>
-                          {message.priority}
-                        </span>
-                        <span className="text-sm text-muted-foreground">{message.timestamp}</span>
-                      </div>
+                    {chat.isPinned && (
+                      <Pin className="absolute top-2 right-2 w-3 h-3 text-muted-foreground" />
+                    )}
+                    
+                    <div className="relative">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={chat.avatar} />
+                        <AvatarFallback className={getTypeColor(chat.type)}>
+                          {getTypeIcon(chat.type)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {chat.isOnline && (
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
+                      )}
                     </div>
-                    <h3 className="font-medium mb-2">{message.subject}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{message.content}</p>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-medium truncate">{chat.name}</h3>
+                        <span className="text-xs text-muted-foreground">{chat.timestamp}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
+                      {chat.participants && chat.type === 'group' && (
+                        <p className="text-xs text-muted-foreground mt-1">{chat.participants} members</p>
+                      )}
+                    </div>
+
+                    {chat.unread > 0 && (
+                      <div className="bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {chat.unread}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            </ScrollArea>
+          </div>
 
-          {activeTab === 'announcements' && (
-            <div className="glass-card rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Company Announcements</h2>
-              <div className="space-y-4">
-                {mockAnnouncements.map((announcement) => (
-                  <div key={announcement.id} className="p-4 rounded-lg border hover:bg-muted/50 transition-all duration-200">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-lg">{announcement.title}</h3>
-                      <span className="text-sm text-muted-foreground">{announcement.date}</span>
+          {/* Chat Area */}
+          <div className={cn(
+            "flex-1 flex flex-col",
+            isMobile && !selectedChat && "hidden"
+          )}>
+            {selectedChat ? (
+              <>
+                {/* Chat Header */}
+                <div className="p-4 border-b flex items-center justify-between bg-background">
+                  <div className="flex items-center gap-3">
+                    {isMobile && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedChat(null)}
+                        className="p-1"
+                      >
+                        ←
+                      </Button>
+                    )}
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={selectedChat.avatar} />
+                      <AvatarFallback className={getTypeColor(selectedChat.type)}>
+                        {getTypeIcon(selectedChat.type)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold">{selectedChat.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedChat.type === 'direct' ? (
+                          selectedChat.isOnline ? 'Online' : 'Last seen recently'
+                        ) : selectedChat.type === 'group' ? (
+                          `${selectedChat.participants} members`
+                        ) : (
+                          selectedChat.type === 'announcement' ? 'Company wide' : 'Department'
+                        )}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm text-muted-foreground">By: {announcement.author}</span>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {announcement.department}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground">{announcement.content}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  
+                  <div className="flex items-center gap-2">
+                    {selectedChat.type === 'direct' && (
+                      <>
+                        <Button variant="ghost" size="sm">
+                          <Phone className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Video className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                    <Button variant="ghost" size="sm">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
 
-          {activeTab === 'compose' && (
-            <div className="glass-card rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Compose Message</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">To:</label>
-                  <Input 
-                    placeholder="Enter recipient..."
-                    value={newMessage.to}
-                    onChange={(e) => setNewMessage({...newMessage, to: e.target.value})}
-                  />
+                {/* Messages */}
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-4">
+                    {mockMessages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          "flex gap-2 max-w-[80%]",
+                          message.isOwn ? "ml-auto flex-row-reverse" : ""
+                        )}
+                      >
+                        {!message.isOwn && (
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="text-xs">
+                              {message.sender.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                        <div
+                          className={cn(
+                            "rounded-lg p-3 max-w-xs lg:max-w-md",
+                            message.isOwn
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          )}
+                        >
+                          {!message.isOwn && (
+                            <p className="text-xs font-medium mb-1">{message.sender}</p>
+                          )}
+                          <p className="text-sm">{message.content}</p>
+                          <p className={cn(
+                            "text-xs mt-1",
+                            message.isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                          )}>
+                            {message.timestamp}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+
+                {/* Message Input */}
+                <div className="p-4 border-t bg-background">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      className="flex-1"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && newMessage.trim()) {
+                          // Handle send message
+                          console.log('Sending:', newMessage);
+                          setNewMessage('');
+                        }
+                      }}
+                    />
+                    <Button 
+                      size="sm" 
+                      disabled={!newMessage.trim()}
+                      onClick={() => {
+                        if (newMessage.trim()) {
+                          console.log('Sending:', newMessage);
+                          setNewMessage('');
+                        }
+                      }}
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Subject:</label>
-                  <Input 
-                    placeholder="Enter subject..."
-                    value={newMessage.subject}
-                    onChange={(e) => setNewMessage({...newMessage, subject: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Message:</label>
-                  <Textarea 
-                    placeholder="Type your message..."
-                    rows={6}
-                    value={newMessage.content}
-                    onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button className="flex items-center gap-2">
-                    <Send className="w-4 h-4" />
-                    Send Message
-                  </Button>
-                  <Button variant="outline" onClick={() => setActiveTab('messages')}>
-                    Cancel
-                  </Button>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center bg-muted/20">
+                <div className="text-center">
+                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Select a conversation</h3>
+                  <p className="text-muted-foreground">Choose a chat from the sidebar to start messaging</p>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </main>
       </div>
     </div>

@@ -1,187 +1,146 @@
-
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Operation } from '@/types';
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Gauge, Info, Map, Settings, Truck, User, Wrench } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Clock, User, Wrench, Fuel } from 'lucide-react';
 
 interface OperationDetailsProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  operation: Operation | null;
-  onEdit: () => void;
+  operation: Operation;
+  onClose: () => void;
 }
 
-const OperationDetails = ({ open, onOpenChange, operation, onEdit }: OperationDetailsProps) => {
-  if (!operation) return null;
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { 
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  // Format time
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('pt-BR', { 
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  // Calculate operation duration
-  const calculateDuration = () => {
-    if (!operation.endTime) {
-      const startTime = new Date(operation.startTime);
-      const now = new Date();
-      const diff = now.getTime() - startTime.getTime();
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${minutes}m (em andamento)`;
-    } else {
-      const startTime = new Date(operation.startTime);
-      const endTime = new Date(operation.endTime);
-      const diff = endTime.getTime() - startTime.getTime();
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      return `${hours}h ${minutes}m`;
+const OperationDetails: React.FC<OperationDetailsProps> = ({ operation, onClose }) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const formatDuration = (start: string, end?: string) => {
+    const startTime = new Date(start);
+    const endTime = end ? new Date(end) : new Date();
+    const diff = endTime.getTime() - startTime.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <span className="text-xl">Operação #{operation.id}</span>
-            <Badge variant={operation.status === 'active' ? 'success' : 'default'}>
-              {operation.status === 'active' ? 'Em Andamento' : 'Concluída'}
-            </Badge>
-          </DialogTitle>
-          <DialogDescription>
-            Iniciada em: {formatDate(operation.startTime)} às {formatTime(operation.startTime)}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Info className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Informações Gerais</span>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-xl">Detalhes da Operação</CardTitle>
+              <p className="text-sm text-muted-foreground">ID: {operation.id}</p>
             </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Operador</span>
-                </div>
-                <span className="text-sm font-medium">{operation.operatorName}</span>
-              </div>
-              
-              <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Empilhadeira</span>
-                </div>
-                <span className="text-sm font-medium">{operation.forkliftModel} ({operation.forkliftId})</span>
-              </div>
-              
-              <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex items-center gap-2">
-                  <Map className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Setor</span>
-                </div>
-                <span className="text-sm font-medium">{operation.sector}</span>
-              </div>
-            </div>
+            <Button variant="outline" onClick={onClose}>
+              Fechar
+            </Button>
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Período e Duração</span>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between border-b pb-2">
-                <span className="text-sm">Início</span>
-                <span className="text-sm font-medium">{formatTime(operation.startTime)}</span>
-              </div>
-              
-              <div className="flex items-center justify-between border-b pb-2">
-                <span className="text-sm">Término</span>
-                <span className="text-sm font-medium">
-                  {operation.endTime ? formatTime(operation.endTime) : 'Em andamento'}
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between border-b pb-2">
-                <span className="text-sm">Duração</span>
-                <span className="text-sm font-medium">{calculateDuration()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        </CardHeader>
         
-        <div className="mt-4 space-y-4">
+        <CardContent className="space-y-6">
+          {/* Status */}
           <div className="flex items-center gap-2">
-            <Gauge className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Horímetro</span>
+            <span className="font-medium">Status:</span>
+            <Badge 
+              variant={operation.status === 'active' ? 'default' : 'default'}
+              className={getStatusColor(operation.status)}
+            >
+              {operation.status === 'active' ? 'Ativa' : 'Concluída'}
+            </Badge>
           </div>
-          
-          <div className="grid grid-cols-2 gap-4 p-3 bg-muted/20 rounded-md">
-            <div>
-              <span className="text-sm text-muted-foreground">Inicial</span>
-              <div className="text-lg font-medium">{operation.initialHourMeter}</div>
-            </div>
-            <div>
-              <span className="text-sm text-muted-foreground">Atual/Final</span>
-              <div className="text-lg font-medium">{operation.currentHourMeter || operation.initialHourMeter}</div>
-            </div>
-          </div>
-          
-          {operation.gasConsumption && (
-            <div className="mt-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Wrench className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Consumo de Combustível</span>
+
+          {/* Operator Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-blue-600" />
+                <span className="font-medium">Operador</span>
               </div>
-              
-              <div className="p-3 bg-muted/20 rounded-md">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm">Consumo Total</span>
-                  <span className="text-sm font-medium">{operation.gasConsumption} L</span>
-                </div>
+              <div className="pl-6">
+                <p className="font-medium">{operation.operatorName}</p>
+                <p className="text-sm text-muted-foreground">ID: {operation.operatorId}</p>
               </div>
             </div>
-          )}
-        </div>
-        
-        <DialogFooter className="gap-2 mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Fechar
-          </Button>
-          <Button onClick={onEdit}>
-            Editar Operação
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-orange-600" />
+                <span className="font-medium">Empilhadeira</span>
+              </div>
+              <div className="pl-6">
+                <p className="font-medium">{operation.forkliftModel}</p>
+                <p className="text-sm text-muted-foreground">ID: {operation.forkliftId}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Time Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-600" />
+                <span className="font-medium">Início</span>
+              </div>
+              <div className="pl-6">
+                <p className="font-medium">{new Date(operation.startTime).toLocaleDateString()}</p>
+                <p className="text-sm text-muted-foreground">{new Date(operation.startTime).toLocaleTimeString()}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-600" />
+                <span className="font-medium">Duração</span>
+              </div>
+              <div className="pl-6">
+                <p className="font-medium">{formatDuration(operation.startTime, operation.endTime)}</p>
+                {operation.endTime && (
+                  <p className="text-sm text-muted-foreground">
+                    Finalizado em: {new Date(operation.endTime).toLocaleTimeString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Fuel className="w-4 h-4 text-red-600" />
+                <span className="font-medium">Consumo de Gás</span>
+              </div>
+              <div className="pl-6">
+                <p className="font-medium">{operation.gasConsumption || 'N/A'} Litros</p>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Horímetro</span>
+              </div>
+              <div className="pl-6">
+                <p className="font-medium">
+                  Inicial: {operation.initialHourMeter}
+                </p>
+                <p className="font-medium">
+                  Atual: {operation.currentHourMeter || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
