@@ -1,4 +1,3 @@
-
 // User/Operator Types
 export enum UserRole {
   // Executive Leaders
@@ -38,7 +37,7 @@ export enum CertificateStatus {
   EXPIRED = "Vencido"
 }
 
-// Forklift Types (legacy)
+// Forklift Types
 export enum ForkliftType {
   GAS = "Gás",
   ELECTRIC = "Elétrica",
@@ -227,29 +226,6 @@ export interface StatusCardProps {
 }
 
 // Legacy types (keeping for compatibility)
-export enum ForkliftType {
-  GAS = "Gás",
-  ELECTRIC = "Elétrica", 
-  RETRACTABLE = "Retrátil"
-}
-
-export enum ForkliftStatus {
-  OPERATIONAL = "Em Operação",
-  STOPPED = "Parada",
-  MAINTENANCE = "Aguardando Manutenção"
-}
-
-export interface Forklift {
-  id: string;
-  model: string;
-  type: ForkliftType;
-  capacity: string;
-  acquisitionDate: string;
-  lastMaintenance: string;
-  status: ForkliftStatus;
-  hourMeter: number;
-}
-
 export interface User {
   id: string;
   name: string;
