@@ -12,6 +12,15 @@ import OperatorsPage from "./pages/Operators";
 import OperationsPage from "./pages/Operations";
 import MaintenancePage from "./pages/Maintenance";
 import GasSupplyPage from "./pages/GasSupply";
+import Branches from "./pages/Branches";
+import Employees from "./pages/Employees";
+import Projects from "./pages/Projects";
+import Tasks from "./pages/Tasks";
+import Finance from "./pages/Finance";
+import CRM from "./pages/CRM";
+import Inventory from "./pages/Inventory";
+import Communication from "./pages/Communication";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -23,12 +32,22 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/branches" element={<Branches />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/finance" element={<Finance />} />
+          <Route path="/crm" element={<CRM />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/communication" element={<Communication />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          {/* Legacy forklift management routes */}
           <Route path="/forklifts" element={<ForkliftsPage />} />
           <Route path="/operators" element={<OperatorsPage />} />
           <Route path="/operations" element={<OperationsPage />} />
           <Route path="/maintenance" element={<MaintenancePage />} />
           <Route path="/gas-supply" element={<GasSupplyPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

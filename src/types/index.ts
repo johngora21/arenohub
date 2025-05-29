@@ -1,4 +1,44 @@
-// Forklift Types
+
+// User/Operator Types
+export enum UserRole {
+  // Executive Leaders
+  CEO = "CEO",
+  CFO = "CFO", 
+  COO = "COO",
+  
+  // HQ Management
+  HQ_MANAGER = "HQ Manager",
+  
+  // Branch Management
+  BRANCH_MANAGER = "Branch Manager",
+  
+  // Department Roles
+  SUPERVISOR_HEAD = "Supervisor/Head",
+  SENIOR_OFFICER = "Senior Officer",
+  JUNIOR_OFFICER = "Junior Officer",
+  INTERN = "Intern",
+  
+  // Additional Roles
+  OPERATOR = "Operator",
+  SUPERVISOR = "Supervisor"
+}
+
+export enum Department {
+  HR = "Human Resources",
+  OPERATIONS = "Operations", 
+  FINANCE = "Finance",
+  SALES_MARKETING = "Sales and Marketing",
+  IT = "Information Technology",
+  PROCUREMENT = "Procurement"
+}
+
+export enum CertificateStatus {
+  REGULAR = "Regular",
+  WARNING = "Próximo do Vencimento",
+  EXPIRED = "Vencido"
+}
+
+// Forklift Types (legacy)
 export enum ForkliftType {
   GAS = "Gás",
   ELECTRIC = "Elétrica",
@@ -20,41 +60,6 @@ export interface Forklift {
   lastMaintenance: string;
   status: ForkliftStatus;
   hourMeter: number;
-}
-
-// User/Operator Types
-export enum UserRole {
-  // Executive Leaders
-  CEO = "CEO",
-  CFO = "CFO", 
-  COO = "COO",
-  
-  // HQ Management
-  HQ_MANAGER = "HQ Manager",
-  
-  // Branch Management
-  BRANCH_MANAGER = "Branch Manager",
-  
-  // Department Roles
-  SUPERVISOR_HEAD = "Supervisor/Head",
-  SENIOR_OFFICER = "Senior Officer",
-  JUNIOR_OFFICER = "Junior Officer",
-  INTERN = "Intern"
-}
-
-export enum Department {
-  HR = "Human Resources",
-  OPERATIONS = "Operations", 
-  FINANCE = "Finance",
-  SALES_MARKETING = "Sales and Marketing",
-  IT = "Information Technology",
-  PROCUREMENT = "Procurement"
-}
-
-export enum CertificateStatus {
-  REGULAR = "Regular",
-  WARNING = "Próximo do Vencimento",
-  EXPIRED = "Vencido"
 }
 
 // Branch Management
