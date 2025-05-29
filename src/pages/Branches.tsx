@@ -5,9 +5,10 @@ import Sidebar from '@/components/layout/Sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Branch, Department } from '@/types';
-import { Building2, Users, MapPin, Mail, Phone, Plus, Search, Filter } from 'lucide-react';
+import { Building2, Users, MapPin, Plus, Search, Filter, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const mockBranches: Branch[] = [
   {
@@ -71,19 +72,19 @@ const Branches = () => {
           subtitle="Manage branches across Tanzania"
         />
         
-        <main className="flex-1 px-6 py-6">
-          <div className="flex justify-between items-center mb-6">
+        <main className="flex-1 p-4 md:p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Branch Management</h1>
-              <p className="text-muted-foreground">Oversee all branch operations and performance</p>
+              <h1 className="text-2xl md:text-3xl font-bold">Branch Management</h1>
+              <p className="text-sm text-muted-foreground">Oversee all branch operations and performance</p>
             </div>
-            <Button className="flex items-center gap-2">
+            <Button className="flex items-center gap-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               Add New Branch
             </Button>
           </div>
 
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
@@ -93,94 +94,106 @@ const Branches = () => {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
               <Filter className="w-4 h-4" />
               Filter
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredBranches.map((branch) => (
-              <div 
+              <Card 
                 key={branch.id}
-                className="glass-card glass-card-hover rounded-xl p-6 cursor-pointer transition-all duration-300"
+                className="hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-primary"
                 onClick={() => setSelectedBranch(branch)}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-primary" />
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Building2 className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-base">{branch.name}</CardTitle>
+                        <p className="text-xs text-muted-foreground">{branch.id}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{branch.name}</h3>
-                      <p className="text-sm text-muted-foreground">{branch.id}</p>
-                    </div>
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                      {branch.status}
+                    </span>
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-status-operational/10 px-2 py-1 text-xs font-medium text-status-operational">
-                    {branch.status}
-                  </span>
-                </div>
+                </CardHeader>
 
-                <div className="space-y-3">
+                <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span>{branch.location}</span>
+                    <MapPin className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs">{branch.location}</span>
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <span>{branch.employeeCount} employees</span>
+                    <Users className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs">{branch.employeeCount} employees</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <Building2 className="w-4 h-4 text-muted-foreground" />
-                    <span>{branch.departments.length} departments</span>
+                    <Building2 className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs">{branch.departments.length} departments</span>
                   </div>
 
                   <div className="pt-3 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Manager</span>
-                      <span className="text-sm font-medium">{branch.manager}</span>
+                      <span className="text-xs text-muted-foreground">Manager</span>
+                      <span className="text-xs font-medium">{branch.manager}</span>
                     </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
           {selectedBranch && (
-            <div className="mt-8 glass-card rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Branch Details: {selectedBranch.name}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-medium mb-2">Departments</h3>
-                  <div className="space-y-2">
-                    {selectedBranch.departments.map((dept) => (
-                      <div key={dept} className="flex items-center justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">{dept}</span>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl">Branch Details: {selectedBranch.name}</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Full Details
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-medium mb-3 text-sm">Departments</h3>
+                    <div className="space-y-2">
+                      {selectedBranch.departments.map((dept) => (
+                        <div key={dept} className="flex items-center justify-between p-2 bg-muted/30 rounded text-xs">
+                          <span>{dept}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-3 text-sm">Quick Stats</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Total Employees</span>
+                        <span className="font-medium">{selectedBranch.employeeCount}</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Quick Stats</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Total Employees</span>
-                      <span className="text-sm font-medium">{selectedBranch.employeeCount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Active Projects</span>
-                      <span className="text-sm font-medium">12</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Pending Tasks</span>
-                      <span className="text-sm font-medium">45</span>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Active Projects</span>
+                        <span className="font-medium">12</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Pending Tasks</span>
+                        <span className="font-medium">45</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
         </main>
       </div>

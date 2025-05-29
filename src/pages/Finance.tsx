@@ -8,6 +8,7 @@ import { Transaction, Department } from '@/types';
 import { DollarSign, TrendingUp, TrendingDown, Plus, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const mockTransactions: Transaction[] = [
   {
@@ -73,56 +74,62 @@ const Finance = () => {
           subtitle="Track finances across all branches"
         />
         
-        <main className="flex-1 px-6 py-6">
-          <div className="flex justify-between items-center mb-6">
+        <main className="flex-1 p-4 md:p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Financial Management</h1>
-              <p className="text-muted-foreground">Monitor financial performance and transactions</p>
+              <h1 className="text-2xl md:text-3xl font-bold">Financial Management</h1>
+              <p className="text-sm text-muted-foreground">Monitor financial performance and transactions</p>
             </div>
-            <Button className="flex items-center gap-2">
+            <Button className="flex items-center gap-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               New Transaction
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="glass-card rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Income</p>
-                  <p className="text-2xl font-bold text-green-600">TSh {totalIncome.toLocaleString()}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="border-l-4 border-l-green-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total Income</p>
+                    <p className="text-lg font-bold text-green-600">TSh {(totalIncome / 1000000).toFixed(1)}M</p>
+                  </div>
+                  <TrendingUp className="w-6 h-6 text-green-600" />
                 </div>
-                <TrendingUp className="w-8 h-8 text-green-600" />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
             
-            <div className="glass-card rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Expenses</p>
-                  <p className="text-2xl font-bold text-red-600">TSh {totalExpenses.toLocaleString()}</p>
+            <Card className="border-l-4 border-l-red-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total Expenses</p>
+                    <p className="text-lg font-bold text-red-600">TSh {(totalExpenses / 1000).toFixed(0)}K</p>
+                  </div>
+                  <TrendingDown className="w-6 h-6 text-red-600" />
                 </div>
-                <TrendingDown className="w-8 h-8 text-red-600" />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
             
-            <div className="glass-card rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Net Profit</p>
-                  <p className={cn(
-                    "text-2xl font-bold",
-                    netProfit >= 0 ? "text-green-600" : "text-red-600"
-                  )}>
-                    TSh {netProfit.toLocaleString()}
-                  </p>
+            <Card className="border-l-4 border-l-blue-500">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Net Profit</p>
+                    <p className={cn(
+                      "text-lg font-bold",
+                      netProfit >= 0 ? "text-green-600" : "text-red-600"
+                    )}>
+                      TSh {(netProfit / 1000000).toFixed(1)}M
+                    </p>
+                  </div>
+                  <DollarSign className="w-6 h-6 text-primary" />
                 </div>
-                <DollarSign className="w-8 h-8 text-primary" />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
@@ -132,32 +139,34 @@ const Finance = () => {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
               <Filter className="w-4 h-4" />
               Filter
             </Button>
           </div>
 
-          <div className="glass-card rounded-xl">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Recent Transactions</h2>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Recent Transactions</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4">Transaction ID</th>
-                      <th className="text-left py-3 px-4">Type</th>
-                      <th className="text-left py-3 px-4">Description</th>
-                      <th className="text-left py-3 px-4">Amount</th>
-                      <th className="text-left py-3 px-4">Date</th>
-                      <th className="text-left py-3 px-4">Status</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">ID</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">Type</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">Description</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">Amount</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">Date</th>
+                      <th className="text-left py-2 px-2 text-xs font-medium">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredTransactions.map((transaction) => (
-                      <tr key={transaction.id} className="border-b border-border hover:bg-muted/50">
-                        <td className="py-4 px-4 font-medium">{transaction.id}</td>
-                        <td className="py-4 px-4">
+                      <tr key={transaction.id} className="border-b border-border hover:bg-muted/30">
+                        <td className="py-3 px-2 text-xs font-medium">{transaction.id}</td>
+                        <td className="py-3 px-2">
                           <span className={cn(
                             "px-2 py-1 rounded-full text-xs font-medium",
                             transaction.type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -165,10 +174,10 @@ const Finance = () => {
                             {transaction.type}
                           </span>
                         </td>
-                        <td className="py-4 px-4">{transaction.description}</td>
-                        <td className="py-4 px-4 font-semibold">TSh {transaction.amount.toLocaleString()}</td>
-                        <td className="py-4 px-4">{transaction.date}</td>
-                        <td className="py-4 px-4">
+                        <td className="py-3 px-2 text-xs">{transaction.description}</td>
+                        <td className="py-3 px-2 text-xs font-semibold">TSh {transaction.amount.toLocaleString()}</td>
+                        <td className="py-3 px-2 text-xs">{transaction.date}</td>
+                        <td className="py-3 px-2">
                           <span className={cn(
                             "px-2 py-1 rounded-full text-xs font-medium",
                             transaction.status === 'Approved' ? 'bg-green-100 text-green-800' :
@@ -183,8 +192,8 @@ const Finance = () => {
                   </tbody>
                 </table>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </main>
       </div>
     </div>

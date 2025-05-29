@@ -5,7 +5,9 @@ import Sidebar from '@/components/layout/Sidebar';
 import DashboardOverview from '@/components/dashboard/DashboardOverview';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Branch, Employee, Project, UserRole, Department } from '@/types';
+import { Branch, Project, Department } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, Users, MapPin, Briefcase, TrendingUp } from 'lucide-react';
 
 // Mock data for the Areno Management Hub
 const mockBranches: Branch[] = [
@@ -121,110 +123,120 @@ const Index = () => {
           subtitle={`${currentDate} - Tanzania Operations`}
         />
         
-        <main className="flex-1 px-6 py-6">
+        <main className="flex-1 p-4 md:p-6 space-y-6">
           <DashboardOverview />
           
-          <section className="mt-8 slide-enter" style={{ animationDelay: '0.4s' }}>
+          <section className="slide-enter" style={{ animationDelay: '0.4s' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">Active Branches</h2>
-              <button className="text-sm text-primary hover:underline">
+              <h2 className="text-lg md:text-xl font-semibold">Active Branches</h2>
+              <button className="text-xs text-primary hover:underline">
                 View all branches
               </button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {mockBranches.map((branch) => (
-                <div 
+                <Card
                   key={branch.id}
-                  className="glass-card glass-card-hover rounded-xl p-4 cursor-pointer transition-all duration-300 transform hover:translate-y-[-2px]"
+                  className="hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-primary"
                   onClick={() => console.log(`Navigate to ${branch.name}`)}
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold">{branch.name}</h3>
-                      <p className="text-muted-foreground text-sm">{branch.location}</p>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-primary" />
+                        <div>
+                          <CardTitle className="text-sm">{branch.name}</CardTitle>
+                          <p className="text-xs text-muted-foreground">{branch.location}</p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                        {branch.status}
+                      </span>
                     </div>
-                    <span className="inline-flex items-center rounded-full bg-status-operational/10 px-2 py-1 text-xs font-medium text-status-operational">
-                      {branch.status}
-                    </span>
-                  </div>
+                  </CardHeader>
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Manager:</span>
-                      <span>{branch.manager}</span>
+                      <span className="font-medium">{branch.manager}</span>
                     </div>
                     
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Employees:</span>
                       <span className="font-semibold">{branch.employeeCount}</span>
                     </div>
                     
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Departments:</span>
                       <span className="font-semibold">{branch.departments.length}</span>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </section>
 
-          <section className="mt-8 slide-enter" style={{ animationDelay: '0.6s' }}>
+          <section className="slide-enter" style={{ animationDelay: '0.6s' }}>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">Active Projects</h2>
-              <button className="text-sm text-primary hover:underline">
+              <h2 className="text-lg md:text-xl font-semibold">Active Projects</h2>
+              <button className="text-xs text-primary hover:underline">
                 View all projects
               </button>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {mockProjects.map((project) => (
-                <div 
+                <Card
                   key={project.id}
-                  className="glass-card glass-card-hover rounded-xl p-4 cursor-pointer transition-all duration-300"
+                  className="hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 border-l-blue-500"
                   onClick={() => console.log(`Navigate to ${project.name}`)}
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold">{project.name}</h3>
-                      <p className="text-muted-foreground text-sm">{project.department}</p>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <CardTitle className="text-sm">{project.name}</CardTitle>
+                          <p className="text-xs text-muted-foreground">{project.department}</p>
+                        </div>
+                      </div>
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
+                        project.status === 'Active' ? 'bg-green-100 text-green-700' :
+                        project.status === 'Planning' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-gray-100 text-gray-700'
+                      )}>
+                        {project.status}
+                      </span>
                     </div>
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
-                      project.status === 'Active' ? 'bg-status-operational/10 text-status-operational' :
-                      project.status === 'Planning' ? 'bg-status-maintenance/10 text-status-maintenance' :
-                      'bg-muted text-muted-foreground'
-                    )}>
-                      {project.status}
-                    </span>
-                  </div>
+                  </CardHeader>
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Manager:</span>
-                      <span>{project.managerName}</span>
+                      <span className="font-medium">{project.managerName}</span>
                     </div>
                     
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Budget:</span>
-                      <span className="font-semibold">TSh {project.budget.toLocaleString()}</span>
+                      <span className="font-semibold">TSh {(project.budget / 1000).toFixed(0)}K</span>
                     </div>
                     
                     <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">Progress:</span>
                         <span className="font-semibold">{project.progress}%</span>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-2">
+                      <div className="w-full bg-muted rounded-full h-1.5">
                         <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          className="bg-primary h-1.5 rounded-full transition-all duration-300"
                           style={{ width: `${project.progress}%` }}
                         />
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </section>

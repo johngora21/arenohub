@@ -150,6 +150,33 @@ export interface Client {
   lastContact: string;
 }
 
+// Inventory
+export interface InventoryItem {
+  id: string;
+  name: string;
+  category: string;
+  quantity: number;
+  minStock: number;
+  supplier: string;
+  branchId: string;
+  lastRestocked: string;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
+}
+
+// Communication
+export interface Message {
+  id: string;
+  subject: string;
+  content: string;
+  sender: string;
+  recipients: string[];
+  branchId?: string;
+  department?: Department;
+  priority: "Low" | "Medium" | "High";
+  status: "Draft" | "Sent" | "Read";
+  sentDate: string;
+}
+
 // Reporting
 export interface Report {
   id: string;

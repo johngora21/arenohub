@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import AnimatedCounter from '@/components/common/AnimatedCounter';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { StatusCardProps } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
 
 const StatusCard: React.FC<StatusCardProps> = ({
   title,
@@ -13,55 +14,59 @@ const StatusCard: React.FC<StatusCardProps> = ({
   change
 }) => {
   const statusClasses = {
-    success: "bg-status-operational/10 text-status-operational border-status-operational/30",
-    warning: "bg-status-maintenance/10 text-status-maintenance border-status-maintenance/30",
-    danger: "bg-status-warning/10 text-status-warning border-status-warning/30",
-    info: "bg-primary/10 text-primary border-primary/30",
-    neutral: "bg-muted text-muted-foreground border-muted-foreground/30"
+    success: "border-l-green-500",
+    warning: "border-l-yellow-500",
+    danger: "border-l-red-500",
+    info: "border-l-blue-500",
+    neutral: "border-l-gray-500"
   };
 
   const iconClasses = {
-    success: "bg-status-operational text-white",
-    warning: "bg-status-maintenance text-white",
-    danger: "bg-status-warning text-white",
-    info: "bg-primary text-white",
-    neutral: "bg-muted-foreground text-white"
+    success: "bg-green-500 text-white",
+    warning: "bg-yellow-500 text-white",
+    danger: "bg-red-500 text-white",
+    info: "bg-blue-500 text-white",
+    neutral: "bg-gray-500 text-white"
   };
 
   return (
-    <div className={cn(
-      "glass-card glass-card-hover p-4 rounded-xl overflow-hidden relative",
+    <Card className={cn(
+      "hover:shadow-lg transition-all duration-300 border-l-4",
       status && statusClasses[status]
     )}>
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-sm font-medium mb-1">{title}</h3>
-          <div className="text-2xl font-bold">
-            <AnimatedCounter value={value} />
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-xs font-medium mb-1 text-muted-foreground">{title}</h3>
+            <div className="text-xl font-bold">
+              <AnimatedCounter value={value} />
+            </div>
+            
+            {change && (
+              <div className="flex items-center mt-2 text-xs">
+                {change.trend === 'up' && <TrendingUp className="w-3 h-3 mr-1 text-green-600" />}
+                {change.trend === 'down' && <TrendingDown className="w-3 h-3 mr-1 text-red-600" />}
+                {change.trend === 'neutral' && <Minus className="w-3 h-3 mr-1 text-gray-600" />}
+                <span className={cn(
+                  "font-medium",
+                  change.trend === 'up' ? "text-green-600" : 
+                  change.trend === 'down' ? "text-red-600" : "text-gray-600"
+                )}>
+                  {change.value}% {change.trend === 'up' ? 'increase' : change.trend === 'down' ? 'decrease' : ''}
+                </span>
+              </div>
+            )}
           </div>
           
-          {change && (
-            <div className="flex items-center mt-2 text-xs">
-              {change.trend === 'up' && <TrendingUp className="w-3 h-3 mr-1" />}
-              {change.trend === 'down' && <TrendingDown className="w-3 h-3 mr-1" />}
-              {change.trend === 'neutral' && <Minus className="w-3 h-3 mr-1" />}
-              {change.value}% {change.trend === 'up' ? 'aumento' : change.trend === 'down' ? 'redução' : ''}
-            </div>
-          )}
+          <div className={cn(
+            "p-2 rounded-lg ml-3",
+            status && iconClasses[status]
+          )}>
+            <Icon className="w-4 h-4" />
+          </div>
         </div>
-        
-        <div className={cn(
-          "p-2 rounded-lg",
-          status && iconClasses[status]
-        )}>
-          <Icon className="w-5 h-5" />
-        </div>
-      </div>
-      
-      {/* Decorative elements */}
-      <div className="absolute -right-4 -bottom-4 w-16 h-16 rounded-full bg-current opacity-10"></div>
-      <div className="absolute right-8 -bottom-6 w-10 h-10 rounded-full bg-current opacity-5"></div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
